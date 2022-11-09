@@ -950,7 +950,7 @@ Spectrum evalPT(BSDFSamplingRecord &bRec,
 			Float q = std::min(currentWight.max(), (Float) 0.95f);
 			if (bRec.sampler->next1D() >= q)
 				break;
-			currentWight /= q;
+			weight /= q;
 		}
 	}
 
