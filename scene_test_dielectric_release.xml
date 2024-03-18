@@ -1,0 +1,100 @@
+<?xml version='1.0' encoding='utf-8'?>
+
+<scene version="0.5.0">
+	<integrator type="path">
+		<integer name="maxDepth" value="-1"/>
+	</integrator>
+
+	<emitter type="constant">
+		<spectrum name="radiance" value="0.8"/>
+	</emitter>
+
+    <shape type="cube">
+        <transform name="toWorld">
+			<translate x="-1.25" y="0.0" z="0"/>
+        	<scale x=".35" y=".7" z=".02"/>         	
+        	<rotate x="1" angle="110"/>
+        	<rotate y="1" angle="45"/>
+            <translate x="0" y="0.26" z="0"/>
+        </transform>        
+		<!-- single-scattering BSDF-->
+		<bsdf type="roughdielectric">
+			<string name="distribution" value="ggx"/> 
+			<float name="alphaU" value="0.6"/>
+			<float name="alphaV" value="0.6"/>
+		</bsdf>
+    </shape>
+
+	
+    <shape type="cube">
+        <transform name="toWorld">
+			<translate x="1.25" y="0.0" z="0"/>
+        	<scale x=".35" y=".7" z=".02"/>         	
+        	<rotate x="1" angle="110"/>
+        	<rotate y="1" angle="45"/>
+            <translate x="0" y="0.26" z="0"/>
+        </transform>
+        <!-- multiple-scattering BSDF-->
+		<bsdf type="roughdielectric_mb_release_git">
+			<string name="distribution" value="ggx"/> 
+			<float name="alphaU" value="0.6"/>
+			<float name="alphaV" value="0.6"/>
+			<integer name="order" value="10"/>
+			<boolean name="BDPT" value="false"/>
+			<boolean name="hCorrelated" value="true"/>
+		</bsdf>
+    </shape>
+	
+    <shape type="rectangle">
+        <transform name="toWorld">
+        	<scale x="1" y="1" z="1"/> 
+        	<rotate x="1" angle="90"/>
+            <translate x="0" y="0" z="0"/>
+        </transform>
+        <bsdf type="twosided"> 
+			<bsdf type="diffuse">
+				<texture name="diffuseReflectance" type="checkerboard">
+					<spectrum name="color0" value="1 1 1"/>
+					<spectrum name="color1" value="0 0 0"/>
+					<float name="uscale" value="5"/>
+					<float name="vscale" value="5"/>
+				</texture>
+			</bsdf>
+		</bsdf>
+    </shape>
+
+    <shape type="rectangle">
+        <transform name="toWorld">
+        	<scale x="4" y="4" z="4"/> 
+        	<rotate x="1" angle="90"/>
+            <translate x="0" y="-0.1" z="0"/>
+        </transform>
+        <bsdf type="twosided"> 
+			<bsdf type="diffuse">
+			<rgb name="reflectance" value="0.5"/>
+				</bsdf>
+		</bsdf>
+    </shape>
+
+	<sensor type="perspective">
+		<float name="fov" value="45"/>
+		<string name="fovAxis" value="x"/>
+		
+		<transform name="toWorld">
+			<lookat origin="1.5, 1.5, 1.5" target="0, 0, 0" up="0, 1, 0"/> </transform>
+		<float name="fov" value="45"/>
+
+		<sampler type="independent">
+			<integer name="sampleCount" value="512"/>
+		</sampler>
+
+		<film type="ldrfilm">
+			<string name="fileFormat" value="jpeg"/>
+			<boolean name="banner" value="false"/>
+			<integer name="height" value="512"/>
+			<integer name="width" value="512"/>
+			<rfilter type="mitchell"/>
+		</film>
+	</sensor>
+
+</scene>
