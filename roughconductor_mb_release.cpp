@@ -177,7 +177,11 @@ MTS_NAMESPACE_BEGIN
 * consider using the \pluginref{twosided} BRDF adapter.
 */
 
-
+static inline float generateRandomNumber()
+{
+	const float U = ((float)rand()) / (float)RAND_MAX;
+	return U;
+}
 
 struct PathSimple{
 	PathSimple(){ count = 0; }
@@ -470,7 +474,14 @@ public:
 	}
 
 	Spectrum eval(BSDFSamplingRecord &bRec, EMeasure measure) const{
-	
+		/* Stop if this component was not requested */
+		if (measure != ESolidAngle ||
+			Frame::cosTheta(bRec.wi) <= 0 ||
+			Frame::cosTheta(bRec.wo) <= 0 ||
+			((bRec.component != -1 && bRec.component != 0) ||
+			!(bRec.typeMask & EGlossyReflection)))
+			return Spectrum(0.0f);
+
 		return  m_bdpt ? evalBDPT(bRec, m_order, measure) : evalPT(bRec, m_order, measure);
 	}
 
@@ -858,7 +869,7 @@ inline void sampleVNDF(BSDFSamplingRecord &bRec, float &pdf) const
 	Normal m;
 
 	/* Sample M, the microfacet normal */
-	Point2 rand = bRec.sampler->next2D();
+	Point2 rand(generateRandomNumber(), generateRandomNumber());
 	m = m_distr->sampleVisible(bRec.wi, rand);
 
 	float D = m_distr->eval(m);
@@ -914,7 +925,7 @@ Spectrum evalPT(BSDFSamplingRecord &bRec,
 #endif
 
 	Spectrum weight = Spectrum(1.0f);
-
+	
 	for (int i = 0; i < order - 1; i++)
 	{
 		float currentPDF = 1.0f;
@@ -948,12 +959,12 @@ Spectrum evalPT(BSDFSamplingRecord &bRec,
 		if (i+1 >= m_rrDepth) {
 
 			Float q = std::min(currentWight.max(), (Float) 0.95f);
-			if (bRec.sampler->next1D() >= q)
+			if (generateRandomNumber() >= q)
 				break;
 			weight /= q;
 		}
 	}
-
+	
 	bRec.wi = w0;
 	bRec.wo = woN;
 	return result;
@@ -973,7 +984,7 @@ void samplePath(const Vector &wi_, Sampler  *sampler, int order, PathSample &pat
 	{
 		float currentPDF;
 		float simplePDF;
-		Point2 rand = sampler->next2D();
+		Point2 rand(generateRandomNumber(), generateRandomNumber());
 		Vector woNew = sampleWi(wi, rand, currentPDF);
 		pdf *= currentPDF;
 
@@ -1042,7 +1053,7 @@ void samplePath(const Vector &wi_, Sampler  *sampler, int order, PathSample &pat
 		if (m_rrDepth > -1 && i + 1 >= m_rrDepth) {
 			Float q = std::min(weightAcc.max(), (Float) 0.95f);
 
-			if (sampler->next1D() > q) {
+			if (generateRandomNumber() > q) {
 				path.add(0.0);
 				break;
 			}
@@ -1321,6 +1332,11 @@ Spectrum evalBDPT(BSDFSamplingRecord &bRec,
 	}
 
 	Spectrum sample(BSDFSamplingRecord &bRec, const Point2 &sample) const {
+		if (Frame::cosTheta(bRec.wi) < 0 ||
+			((bRec.component != -1 && bRec.component != 0) ||
+			!(bRec.typeMask & EGlossyReflection)))
+			return Spectrum(0.0f);
+
 		float pdf;
 		return this->sample(bRec, pdf, sample);
 	}

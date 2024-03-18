@@ -169,6 +169,12 @@ MTS_NAMESPACE_BEGIN
  */
 #define THRESHOLD 1e-4
 
+static inline float generateRandomNumber()
+{
+	const float U = ((float)rand()) / (float)RAND_MAX;
+	return U;
+}
+
 class SegmentTerm {
 public:
     float              lambdao;
@@ -546,7 +552,7 @@ public:
         for (int i = 0; i < order - 1; i++) {
             float currentPDF;
             // test
-            Vector woNew  = sampleVNDF(wi, alpha_x, alpha_y, sampler->next2D());
+			Vector woNew = sampleVNDF(wi, alpha_x, alpha_y, Point2(generateRandomNumber(), generateRandomNumber()));
             currentPDF    = pdfVNDF(wi, woNew, alpha_x, alpha_y);
             pdf          *= currentPDF;
 
@@ -595,7 +601,7 @@ public:
             if (m_rrDepth > -1 && i + 1 >= m_rrDepth) {
                 Float q = std::min(weightAcc.max(), (Float)0.95f);
 
-                if (sampler->next1D() > q) {
+				if (generateRandomNumber() > q) {
                     path.add(0.0);
                     break;
                 } else {
@@ -703,7 +709,7 @@ public:
         Normal m;
 
         /* Sample M, the microfacet normal */
-        Point2 rand = bRec.sampler->next2D();
+		Point2 rand(generateRandomNumber(), generateRandomNumber());
         if (m_type == MicrofacetDistribution::EGGX) {
             m = sampleGGXVNDF(bRec.wi, alpha_x, alpha_y, rand.x, rand.y);
         } else {
@@ -752,7 +758,7 @@ public:
 
             if (i >= m_rrDepth) {
                 Float q = std::max(std::min(Sk, 0.95f), (Float)0.3f);
-                if (bRec.sampler->next1D() >= q)
+                if (generateRandomNumber() >= q)
                     break; // russian roulette
                 weight /= q;
             }
