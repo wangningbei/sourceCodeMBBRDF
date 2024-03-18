@@ -190,6 +190,7 @@ MTS_NAMESPACE_BEGIN
 * \end{xml}
 */
 
+
 struct PathSimple{
 	PathSimple(){ count = 0; }
 
@@ -808,7 +809,7 @@ public:
 
 
 		m =  m_type == MicrofacetDistribution::EBeckmann ?
-			m_distr->sample(outside ? bRec.wi : -bRec.wi, bRec.sampler->next2D())
+			m_distr->sample(outside ? bRec.wi : -bRec.wi, Point2(generateRandomNumber(), generateRandomNumber()))
 			:sampleD_GGX(outside ? bRec.wi : -bRec.wi, alpha_x, alpha_y);
 
 		//m_distr->sample(outside ? bRec.wi : -bRec.wi, bRec.sampler->next2D());// , pdf);
@@ -844,7 +845,7 @@ public:
 		Float cosThetaT;
 		Float F = fresnelDielectricExt(dot(bRec.wi, m), cosThetaT, m_eta);
 		Float dwh_dwo;
-		if (bRec.sampler->next1D() < F)
+		if (generateRandomNumber() < F)
 		{
 			bRec.wo = reflect(bRec.wi, m);
 			bRec.eta = 1.0f;
@@ -879,7 +880,7 @@ public:
 	inline void sampleVNDF(BSDFSamplingRecord &bRec, float &pdf, bool outside, float inLamda, float alpha_x, float alpha_y) const
 	{
 		Normal m = (m_type == MicrofacetDistribution::EBeckmann) ?
-			m_distr->sample(outside ? bRec.wi : -bRec.wi, bRec.sampler->next2D()) 
+			m_distr->sample(outside ? bRec.wi : -bRec.wi, Point2(generateRandomNumber(), generateRandomNumber()))
 			: sampleD_GGX(outside ? bRec.wi : -bRec.wi, alpha_x, alpha_y);
 
 		if (m.z <= 1e-3)
@@ -905,7 +906,7 @@ public:
 		Float cosThetaT;
 		Float F = fresnelDielectricExt(dot(bRec.wi, m), cosThetaT, m_eta);
 
-		if (bRec.sampler->next1D() < F)
+		if (generateRandomNumber() < F)
 		{
 			bRec.wo = reflect(bRec.wi, m);
 			bRec.eta = 1.0f;
@@ -1189,7 +1190,7 @@ public:
 			if (m_rrDepth > -1 && i + 1 >= m_rrDepth) {
 				Float q = std::min(weightAcc * eta * eta, (Float) 0.95f);
 
-				if (bRec.sampler->next1D() > q) {
+				if (generateRandomNumber() > q) {
 					path.add(0.0);
 					break;
 				}
@@ -1266,7 +1267,7 @@ public:
 			if (m_rrDepth > -1 && i + 1 >= m_rrDepth) {
 				Float q = std::min(weightAcc * eta * eta, (Float) 0.95f);
 
-				if (bRec.sampler->next1D() > q) {
+				if (generateRandomNumber() > q) {
 					path.add(0.0);
 					break;
 				}
@@ -1634,7 +1635,7 @@ public:
 
 			if (i + 1 >= m_rrDepth) {
 				Float q = std::min(currentWight * eta * eta, (Float) 0.95f);
-				if (bRec.sampler->next1D() >= q)
+				if (generateRandomNumber() >= q)
 					break;
 				currentWight /= q;
 			}
