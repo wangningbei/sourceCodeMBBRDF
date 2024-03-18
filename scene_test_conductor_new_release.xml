@@ -1,0 +1,104 @@
+<?xml version='1.0' encoding='utf-8'?>
+
+<scene version="0.5.0">
+	<integrator type="volpath">
+		<integer name="maxDepth" value="-1"/>
+	</integrator>
+
+	<shape type="rectangle">
+	    <transform name="toWorld">
+          	<rotate x="1" angle="90"/>
+            <translate x="0.0" y="2.0" z="0"/>
+        </transform>		
+		<emitter type="area">
+			<spectrum name="radiance" value="4"/>
+		</emitter>
+	</shape>
+	
+	<emitter type="sky"/>
+		
+    <shape type="sphere">
+        <transform name="toWorld">
+			<translate x="0" y="0.0" z="1.5"/>
+        	<scale x=".35" y=".35" z="0.35"/>           	
+            <translate x="0.1" y="0.33" z="0.1"/>
+        </transform>
+        <!-- single-scattering BSDF-->
+		<bsdf type="roughconductor">
+			<string name="distribution" value="ggx"/> 
+			<string name="material" value="Cu" />			
+			<float name="alphaU" value="0.5"/>
+			<float name="alphaV" value="0.5"/>
+		</bsdf>
+    </shape>
+
+    <shape type="sphere">
+        <transform name="toWorld">
+			<translate x="1.5" y="0.0" z="0"/>
+        	<scale x=".35" y=".35" z="0.35"/>         	
+            <translate x="0.1" y="0.33" z="0.1"/>
+        </transform>
+        <!-- multiple-scattering BSDF-->
+		<bsdf type="roughconductor_mb_new_release">
+			<string name="distribution" value="ggx"/> 
+			<string name="material" value="Cu" />
+			<float name="alphaU" value="0.5"/>
+			<float name="alphaV" value="0.5"/>
+			<integer name="order" value="10"/>
+			<boolean name="BDPT" value="false"/>
+		</bsdf>
+    </shape>
+	
+    <shape type="rectangle">
+        <transform name="toWorld">
+        	<scale x="1" y="1" z="1"/> 
+        	<rotate x="1" angle="90"/>
+            <translate x="0" y="0" z="0"/>
+        </transform>
+        <bsdf type="twosided"> 
+			<bsdf type="diffuse">
+				<texture name="diffuseReflectance" type="checkerboard">
+					<spectrum name="color0" value="1 1 1"/>
+					<spectrum name="color1" value="0 0 0"/>
+					<float name="uscale" value="5"/>
+					<float name="vscale" value="5"/>
+				</texture>
+			</bsdf>
+		</bsdf>
+    </shape>
+
+    <shape type="rectangle">
+        <transform name="toWorld">
+        	<scale x="4" y="4" z="4"/> 
+        	<rotate x="1" angle="90"/>
+            <translate x="0" y="-0.1" z="0"/>
+        </transform>
+        <bsdf type="twosided"> 
+			<bsdf type="diffuse">
+			<rgb name="reflectance" value="0.5"/>
+				</bsdf>
+		</bsdf>
+    </shape>
+
+	<sensor type="perspective">
+		<float name="fov" value="45"/>
+		<string name="fovAxis" value="x"/>
+		
+		<transform name="toWorld">
+			<lookat origin="1.5, 1.5, 1.5" target="0, 0, 0" up="0, 1, 0"/> </transform>
+		<float name="fov" value="45"/>
+
+		<sampler type="independent">
+			<integer name="sampleCount" value="512"/>
+		</sampler>
+
+		<film type="ldrfilm">
+			<string name="fileFormat" value="jpeg"/>
+			<boolean name="banner" value="false"/>
+			<integer name="height" value="512"/>
+			<integer name="width" value="512"/>
+			<rfilter type="mitchell"/>
+		</film>
+	</sensor>
+
+</scene>
